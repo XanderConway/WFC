@@ -2,21 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class PrototypeData
+public class PrototypeData : MonoBehaviour
 {
     private string[] faceNames ={"X", "Z", "-X", "-Z", "Top", "Botton"};
 
     // X, Y, Z
     public Socket[] sockets = new Socket[6];
     public List<string> excludedIds;
-    public List<PrototypeData>[] validNeighbors = new List<PrototypeData>[6];
-    public int orientation;
-    public GameObject model;
+    public HashSet<PrototypeData>[] validNeighbors = new HashSet<PrototypeData>[6];
 
-    void Start() {
+    public int orientation;
+
+    public int probaility = 1;
+
+    void Awake() {
         for(int i = 0; i < 6; i++) {
-            validNeighbors[i] = new List<PrototypeData>();
+            validNeighbors[i] = new HashSet<PrototypeData>();
+
         }
     }
 

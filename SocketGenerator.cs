@@ -39,6 +39,28 @@ class VectorListComparator : IEqualityComparer<List<Vector2Int>>
     }
 }
 
+
+class HashsetComparator : IEqualityComparer<HashSet<Vector2Int>>
+{
+
+
+    public bool Equals(HashSet<Vector2Int> x, HashSet<Vector2Int> y)
+    {
+        return x.SetEquals(y);
+    }
+
+
+    public int GetHashCode(HashSet<Vector2Int> obj)
+    {
+        int sum = 0;
+        foreach(Vector2Int val in obj)
+        {
+            sum += val.x + val.y;
+        }
+        return sum;
+    }
+}
+
 public class Vector2IntComparator : IComparer<Vector2Int>
 {
     int IComparer<Vector2Int>.Compare(Vector2Int x, Vector2Int y)
@@ -51,16 +73,16 @@ public class SocketGenerator
 {
     private int id_num;
 
-    private Dictionary<List<Vector2Int>, Socket> lateralSockets;
-    private Dictionary<List<Vector2Int>, Socket> verticalSockets;
+    private Dictionary<HashSet<Vector2Int>, Socket> lateralSockets;
+    private Dictionary<HashSet<Vector2Int>, Socket> verticalSockets;
 
     public SocketGenerator()
     {
-        lateralSockets = new Dictionary<List<Vector2Int>, Socket>(new VectorListComparator());
-        verticalSockets = new Dictionary<List<Vector2Int>, Socket>(new VectorListComparator());
+        lateralSockets = new Dictionary<HashSet<Vector2Int>, Socket>(new HashsetComparator());
+        verticalSockets = new Dictionary<HashSet<Vector2Int>, Socket>(new HashsetComparator());
     }
 
-    public Socket getSocket(List<Vector2Int> verts)
+    public Socket getSocket(HashSet<Vector2Int> verts)
     {
         Socket socket = null;
         lateralSockets.TryGetValue(verts, out socket);
@@ -71,7 +93,7 @@ public class SocketGenerator
         }
         else
         {
-            List<Vector2Int> flipped = getSymmetric(verts);
+            HashSet<Vector2Int> flipped = getSymmetric(verts);
             lateralSockets.TryGetValue(flipped, out socket);
 
             if (socket != null)
@@ -82,7 +104,7 @@ public class SocketGenerator
             }
             else
             {
-                bool sym = new VectorListComparator().Equals(flipped, verts);
+                bool sym = new HashsetComparator().Equals(flipped, verts);
                 Socket newSocket = createNewSocket(sym, -1, false);
                 lateralSockets.Add(verts, newSocket);
                 return newSocket;
@@ -90,7 +112,7 @@ public class SocketGenerator
         }
     }
 
-    public Socket getSocketVertical(List<Vector2Int> verts, int orientation)
+    public Socket getSocketVertical(HashSet<Vector2Int> verts, int orientation)
     {
         Socket socket = null;
         verticalSockets.TryGetValue(verts, out socket);
@@ -113,16 +135,17 @@ public class SocketGenerator
         return new Socket(id_num, sym, orientation, flipped, vertical);
     }
 
-    private List<Vector2Int> getSymmetric(List<Vector2Int> verts)
+    private HashSet<Vector2Int> getSymmetric(HashSet<Vector2Int> verts)
     {
 
-        List<Vector2Int> flipped = new List<Vector2Int>();
-        for (int i = 0; i < verts.Count; i++)
+        HashSet<Vector2Int> flipped = new HashSet<Vector2Int>();
+
+        
+        foreach(Vector2Int vert in verts)
         {
-            Vector2Int reflected = new Vector2Int(-verts[i].x, verts[i].y);
+            Vector2Int reflected = new Vector2Int(-vert.x, vert.y);
             flipped.Add(reflected);
         }
-        flipped.Sort(new Vector2IntComparator());
         return flipped;
     }
 }

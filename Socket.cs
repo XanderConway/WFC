@@ -10,11 +10,14 @@ public class Socket
     public bool flipped;
     public bool vertical;
 
+    public int orientation;
+
     public Socket(int id, bool sym, int orientation, bool flipped, bool vertical) {
         this.id = id;
         this.symmetric = sym;
         this.flipped = flipped;
         this.vertical = vertical;
+        this.orientation = orientation;
     }
 }
 
